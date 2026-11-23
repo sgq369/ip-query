@@ -1,0 +1,467 @@
+#!/usr/bin/env python3
+"""中文本地化映射：单一事实来源，生成后注入 Worker 与前端。
+
+用法：python3 tools/gen-cn-names.py
+改映射只改本文件，跑完脚本后部署（deploy.py）。
+注入位置（标记间内容会被覆盖）：
+  - src/index.js：// __CN_NAMES_BEGIN__ … // __CN_NAMES_END__
+  - public/index.html：/* __CN_NAMES_BEGIN__ */ … /* __CN_NAMES_END__ */
+"""
+import json
+import re
+
+# (ISO 代码, 英文名, 中文名)
+COUNTRIES = [
+    ("US", "United States", "美国"), ("CN", "China", "中国"),
+    ("TW", "Taiwan", "台湾"), ("HK", "Hong Kong", "香港"),
+    ("MO", "Macao", "澳门"), ("JP", "Japan", "日本"),
+    ("KR", "South Korea", "韩国"), ("KP", "North Korea", "朝鲜"),
+    ("SG", "Singapore", "新加坡"), ("MY", "Malaysia", "马来西亚"),
+    ("TH", "Thailand", "泰国"), ("VN", "Vietnam", "越南"),
+    ("ID", "Indonesia", "印度尼西亚"), ("PH", "Philippines", "菲律宾"),
+    ("IN", "India", "印度"), ("PK", "Pakistan", "巴基斯坦"),
+    ("BD", "Bangladesh", "孟加拉国"), ("LK", "Sri Lanka", "斯里兰卡"),
+    ("NP", "Nepal", "尼泊尔"), ("MM", "Myanmar", "缅甸"),
+    ("KH", "Cambodia", "柬埔寨"), ("LA", "Laos", "老挝"),
+    ("MN", "Mongolia", "蒙古"), ("KZ", "Kazakhstan", "哈萨克斯坦"),
+    ("UZ", "Uzbekistan", "乌兹别克斯坦"), ("KG", "Kyrgyzstan", "吉尔吉斯斯坦"),
+    ("TJ", "Tajikistan", "塔吉克斯坦"), ("TM", "Turkmenistan", "土库曼斯坦"),
+    ("GE", "Georgia", "格鲁吉亚"), ("AM", "Armenia", "亚美尼亚"),
+    ("AZ", "Azerbaijan", "阿塞拜疆"), ("TR", "Turkey", "土耳其"),
+    ("TR", "Turkiye", "土耳其"), ("IL", "Israel", "以色列"),
+    ("PS", "Palestine", "巴勒斯坦"), ("AE", "United Arab Emirates", "阿联酋"),
+    ("SA", "Saudi Arabia", "沙特阿拉伯"), ("QA", "Qatar", "卡塔尔"),
+    ("KW", "Kuwait", "科威特"), ("BH", "Bahrain", "巴林"),
+    ("OM", "Oman", "阿曼"), ("JO", "Jordan", "约旦"),
+    ("LB", "Lebanon", "黎巴嫩"), ("IQ", "Iraq", "伊拉克"),
+    ("IR", "Iran", "伊朗"), ("SY", "Syria", "叙利亚"),
+    ("YE", "Yemen", "也门"), ("AF", "Afghanistan", "阿富汗"),
+    ("GB", "United Kingdom", "英国"), ("IE", "Ireland", "爱尔兰"),
+    ("FR", "France", "法国"), ("DE", "Germany", "德国"),
+    ("NL", "Netherlands", "荷兰"), ("BE", "Belgium", "比利时"),
+    ("LU", "Luxembourg", "卢森堡"), ("CH", "Switzerland", "瑞士"),
+    ("AT", "Austria", "奥地利"), ("SE", "Sweden", "瑞典"),
+    ("NO", "Norway", "挪威"), ("DK", "Denmark", "丹麦"),
+    ("FI", "Finland", "芬兰"), ("IS", "Iceland", "冰岛"),
+    ("ES", "Spain", "西班牙"), ("PT", "Portugal", "葡萄牙"),
+    ("IT", "Italy", "意大利"), ("GR", "Greece", "希腊"),
+    ("PL", "Poland", "波兰"), ("CZ", "Czechia", "捷克"),
+    ("CZ", "Czech Republic", "捷克"), ("SK", "Slovakia", "斯洛伐克"),
+    ("HU", "Hungary", "匈牙利"), ("RO", "Romania", "罗马尼亚"),
+    ("BG", "Bulgaria", "保加利亚"), ("HR", "Croatia", "克罗地亚"),
+    ("SI", "Slovenia", "斯洛文尼亚"), ("RS", "Serbia", "塞尔维亚"),
+    ("BA", "Bosnia and Herzegovina", "波黑"),
+    ("ME", "Montenegro", "黑山"), ("AL", "Albania", "阿尔巴尼亚"),
+    ("MK", "North Macedonia", "北马其顿"), ("UA", "Ukraine", "乌克兰"),
+    ("RU", "Russia", "俄罗斯"), ("BY", "Belarus", "白俄罗斯"),
+    ("MD", "Moldova", "摩尔多瓦"), ("EE", "Estonia", "爱沙尼亚"),
+    ("LV", "Latvia", "拉脱维亚"), ("LT", "Lithuania", "立陶宛"),
+    ("CY", "Cyprus", "塞浦路斯"), ("MT", "Malta", "马耳他"),
+    ("AD", "Andorra", "安道尔"), ("MC", "Monaco", "摩纳哥"),
+    ("LI", "Liechtenstein", "列支敦士登"), ("SM", "San Marino", "圣马力诺"),
+    ("VA", "Vatican City", "梵蒂冈"), ("GI", "Gibraltar", "直布罗陀"),
+    ("FO", "Faroe Islands", "法罗群岛"), ("GL", "Greenland", "格陵兰"),
+    ("JE", "Jersey", "泽西"), ("GG", "Guernsey", "根西"),
+    ("IM", "Isle of Man", "马恩岛"), ("AX", "Aland Islands", "奥兰"),
+    ("EG", "Egypt", "埃及"), ("ZA", "South Africa", "南非"),
+    ("NG", "Nigeria", "尼日利亚"), ("KE", "Kenya", "肯尼亚"),
+    ("MA", "Morocco", "摩洛哥"), ("DZ", "Algeria", "阿尔及利亚"),
+    ("TN", "Tunisia", "突尼斯"), ("LY", "Libya", "利比亚"),
+    ("ET", "Ethiopia", "埃塞俄比亚"), ("GH", "Ghana", "加纳"),
+    ("CI", "Ivory Coast", "科特迪瓦"), ("CI", "Cote d'Ivoire", "科特迪瓦"),
+    ("SN", "Senegal", "塞内加尔"), ("AO", "Angola", "安哥拉"),
+    ("ZM", "Zambia", "赞比亚"), ("ZW", "津巴布韦", "津巴布韦"),
+    ("MZ", "Mozambique", "莫桑比克"), ("MG", "Madagascar", "马达加斯加"),
+    ("MU", "Mauritius", "毛里求斯"), ("TZ", "Tanzania", "坦桑尼亚"),
+    ("UG", "Uganda", "乌干达"), ("SD", "Sudan", "苏丹"),
+    ("SS", "South Sudan", "南苏丹"), ("SO", "Somalia", "索马里"),
+    ("CM", "Cameroon", "喀麦隆"), ("NA", "Namibia", "纳米比亚"),
+    ("BW", "Botswana", "博茨瓦纳"), ("RW", "Rwanda", "卢旺达"),
+    ("CA", "Canada", "加拿大"), ("MX", "Mexico", "墨西哥"),
+    ("BR", "Brazil", "巴西"), ("AR", "Argentina", "阿根廷"),
+    ("CL", "Chile", "智利"), ("CO", "Colombia", "哥伦比亚"),
+    ("PE", "Peru", "秘鲁"), ("VE", "Venezuela", "委内瑞拉"),
+    ("EC", "Ecuador", "厄瓜多尔"), ("UY", "Uruguay", "乌拉圭"),
+    ("PY", "Paraguay", "巴拉圭"), ("BO", "Bolivia", "玻利维亚"),
+    ("CR", "Costa Rica", "哥斯达黎加"), ("PA", "Panama", "巴拿马"),
+    ("CU", "Cuba", "古巴"), ("DO", "Dominican Republic", "多米尼加"),
+    ("PR", "Puerto Rico", "波多黎各"), ("JM", "Jamaica", "牙买加"),
+    ("GT", "Guatemala", "危地马拉"), ("HN", "Honduras", "洪都拉斯"),
+    ("SV", "El Salvador", "萨尔瓦多"), ("NI", "Nicaragua", "尼加拉瓜"),
+    ("BZ", "Belize", "伯利兹"), ("BS", "Bahamas", "巴哈马"),
+    ("BB", "Barbados", "巴巴多斯"), ("TT", "Trinidad and Tobago", "特立尼达和多巴哥"),
+    ("GY", "Guyana", "圭亚那"), ("SR", "Suriname", "苏里南"),
+    ("GF", "French Guiana", "法属圭亚那"), ("FK", "Falkland Islands", "福克兰群岛"),
+    ("AU", "Australia", "澳大利亚"), ("NZ", "New Zealand", "新西兰"),
+    ("FJ", "Fiji", "斐济"), ("PG", "Papua New Guinea", "巴布亚新几内亚"),
+    ("SB", "Solomon Islands", "所罗门群岛"), ("VU", "Vanuatu", "瓦努阿图"),
+    ("NC", "New Caledonia", "新喀里多尼亚"), ("PF", "French Polynesia", "法属波利尼西亚"),
+    ("GU", "Guam", "关岛"), ("MP", "Northern Mariana Islands", "北马里亚纳"),
+    ("AS", "American Samoa", "美属萨摩亚"), ("WS", "Samoa", "萨摩亚"),
+    ("TO", "Tonga", "汤加"), ("KI", "Kiribati", "基里巴斯"),
+    ("FM", "Micronesia", "密克罗尼西亚"), ("MH", "Marshall Islands", "马绍尔群岛"),
+    ("PW", "Palau", "帕劳"), ("NR", "Nauru", "瑙鲁"),
+    ("TV", "Tuvalu", "图瓦卢"), ("BT", "Bhutan", "不丹"),
+    ("MV", "Maldives", "马尔代夫"), ("TL", "Timor-Leste", "东帝汶"),
+    ("BN", "Brunei", "文莱"),
+    ("RE", "Reunion", "留尼汪"), ("YT", "Mayotte", "马约特"),
+    ("GP", "Guadeloupe", "瓜德罗普"), ("MQ", "Martinique", "马提尼克"),
+    ("AW", "Aruba", "阿鲁巴"), ("CW", "Curacao", "库拉索"),
+    ("SX", "Sint Maarten", "荷属圣马丁"), ("MF", "Saint Martin", "圣马丁"),
+    ("BL", "Saint Barthelemy", "圣巴泰勒米"), ("BM", "Bermuda", "百慕大"),
+    ("KY", "Cayman Islands", "开曼群岛"), ("VG", "British Virgin Islands", "英属维尔京群岛"),
+    ("VI", "U.S. Virgin Islands", "美属维尔京群岛"),
+    ("SH", "Saint Helena", "圣赫勒拿"), ("CV", "Cape Verde", "佛得角"),
+    ("ST", "Sao Tome and Principe", "圣多美和普林西比"),
+    ("SC", "Seychelles", "塞舌尔"), ("KM", "Comoros", "科摩罗"),
+    ("DJ", "Djibouti", "吉布提"), ("ER", "Eritrea", "厄立特里亚"),
+    ("ML", "Mali", "马里"), ("NE", "Niger", "尼日尔"),
+    ("TD", "Chad", "乍得"), ("CF", "Central African Republic", "中非"),
+    ("BJ", "Benin", "贝宁"), ("TG", "Togo", "多哥"),
+    ("SL", "Sierra Leone", "塞拉利昂"), ("LR", "Liberia", "利比里亚"),
+    ("GN", "Guinea", "几内亚"), ("GW", "Guinea-Bissau", "几内亚比绍"),
+    ("MR", "Mauritania", "毛里塔尼亚"), ("GA", "Gabon", "加蓬"),
+    ("CG", "Republic of the Congo", "刚果（布）"),
+    ("CD", "Democratic Republic of the Congo", "刚果（金）"),
+    ("BI", "Burundi", "布隆迪"), ("MW", "Malawi", "马拉维"),
+    ("LS", "Lesotho", "莱索托"), ("SZ", "Eswatini", "斯威士兰"),
+    ("SZ", "Swaziland", "斯威士兰"), ("GQ", "Equatorial Guinea", "赤道几内亚"),
+    ("IO", "British Indian Ocean Territory", "英属印度洋领地"),
+    ("AQ", "Antarctica", "南极洲"), ("BV", "Bouvet Island", "布韦岛"),
+    ("HM", "Heard Island and McDonald Islands", "赫德岛"),
+    ("GS", "South Georgia and the South Sandwich Islands", "南乔治亚"),
+    ("TF", "French Southern Territories", "法属南部领地"),
+    ("UM", "United States Minor Outlying Islands", "美国本土外小岛屿"),
+    ("BQ", "Bonaire, Sint Eustatius and Saba", "荷属加勒比"),
+]
+
+# 州 / 省 / 城市（英文小写 → 中文）。州与同名市共用一个译名（如纽约、华盛顿）。
+PLACES = {
+    # 美国各州
+    "california": "加利福尼亚", "texas": "得克萨斯", "florida": "佛罗里达",
+    "washington": "华盛顿", "oregon": "俄勒冈", "nevada": "内华达",
+    "arizona": "亚利桑那", "utah": "犹他", "colorado": "科罗拉多",
+    "new mexico": "新墨西哥", "idaho": "爱达荷", "montana": "蒙大拿",
+    "wyoming": "怀俄明", "north dakota": "北达科他", "south dakota": "南达科他",
+    "nebraska": "内布拉斯加", "kansas": "堪萨斯", "oklahoma": "俄克拉荷马",
+    "missouri": "密苏里", "iowa": "爱荷华", "minnesota": "明尼苏达",
+    "wisconsin": "威斯康星", "michigan": "密歇根", "illinois": "伊利诺伊",
+    "indiana": "印第安纳", "ohio": "俄亥俄", "kentucky": "肯塔基",
+    "tennessee": "田纳西", "alabama": "阿拉巴马", "georgia": "佐治亚",
+    "south carolina": "南卡罗来纳", "north carolina": "北卡罗来纳",
+    "virginia": "弗吉尼亚", "west virginia": "西弗吉尼亚",
+    "maryland": "马里兰", "delaware": "特拉华", "new jersey": "新泽西",
+    "pennsylvania": "宾夕法尼亚", "connecticut": "康涅狄格",
+    "rhode island": "罗得岛", "massachusetts": "马萨诸塞",
+    "vermont": "佛蒙特", "new hampshire": "新罕布什尔", "maine": "缅因",
+    "alaska": "阿拉斯加", "hawaii": "夏威夷",
+    "district of columbia": "华盛顿特区",
+    # 美国城市
+    "mountain view": "山景城", "san francisco": "旧金山", "san jose": "圣何塞",
+    "los angeles": "洛杉矶", "san diego": "圣迭戈", "sacramento": "萨克拉门托",
+    "palo alto": "帕洛阿尔托", "sunnyvale": "桑尼维尔", "cupertino": "库比蒂诺",
+    "menlo park": "门洛帕克", "redwood city": "红木城", "fremont": "弗里蒙特",
+    "oakland": "奥克兰", "berkeley": "伯克利", "santa clara": "圣克拉拉",
+    "santa cruz": "圣克鲁斯", "san mateo": "圣马特奥", "hayward": "海沃德",
+    "ashburn": "阿什本", "reston": "雷斯顿", "herndon": "赫恩登",
+    "chicago": "芝加哥", "new york": "纽约", "seattle": "西雅图",
+    "dallas": "达拉斯", "houston": "休斯敦", "austin": "奥斯汀",
+    "atlanta": "亚特兰大", "miami": "迈阿密", "boston": "波士顿",
+    "denver": "丹佛", "phoenix": "菲尼克斯", "las vegas": "拉斯维加斯",
+    "portland": "波特兰", "salt lake city": "盐湖城", "nashville": "纳什维尔",
+    "minneapolis": "明尼阿波利斯", "detroit": "底特律", "cleveland": "克利夫兰",
+    "pittsburgh": "匹兹堡", "philadelphia": "费城", "baltimore": "巴尔的摩",
+    "st. louis": "圣路易斯", "kansas city": "堪萨斯城", "new orleans": "新奥尔良",
+    "memphis": "孟菲斯", "charlotte": "夏洛特", "raleigh": "罗利",
+    "columbus": "哥伦布", "cincinnati": "辛辛那提",
+    "indianapolis": "印第安纳波利斯", "milwaukee": "密尔沃基",
+    "albuquerque": "阿尔伯克基", "tucson": "图森", "honolulu": "檀香山",
+    "anchorage": "安克雷奇", "flower mound": "花丘", "plano": "普莱诺",
+    "frisco": "弗里斯科", "irving": "欧文", "arlington": "阿灵顿",
+    "fort worth": "沃思堡", "denton": "丹顿", "richardson": "理查森",
+    "garland": "加兰", "mesquite": "梅斯基特", "carrollton": "卡罗尔顿",
+    "lewisville": "刘易斯维尔", "allen": "艾伦", "mckinney": "麦金尼",
+    "benicia": "贝尼西亚", "fairfield": "费尔菲尔德", "vallejo": "瓦列霍",
+    "petaluma": "佩塔卢马", "american canyon": "美国峡谷",
+    "point reyes national seashore": "雷耶斯角国家海岸",
+    "santa rosa": "圣罗莎", "napa": "纳帕", "concord": "康科德",
+    "san rafael": "圣拉斐尔", "novato": "诺瓦托", "martinez": "马丁内斯",
+    "littleton": "利特尔顿", "aurora": "奥罗拉", "lakewood": "莱克伍德",
+    "arvada": "阿瓦达", "westminster": "威斯敏斯特", "thornton": "桑顿",
+    "centennial": "森特尼尔", "boulder": "博尔德",
+    "fort collins": "柯林斯堡", "colorado springs": "科罗拉多斯普林斯",
+    "pueblo": "普韦布洛", "greeley": "格里利", "longmont": "朗蒙特",
+    "loveland": "拉夫兰", "grand junction": "大章克申", "aspen": "阿斯彭",
+    "vail": "韦尔", "durango": "杜兰戈",
+    "san antonio": "圣安东尼奥", "el paso": "埃尔帕索",
+    "oklahoma city": "俄克拉荷马城", "tulsa": "塔尔萨",
+    "wichita": "威奇托", "omaha": "奥马哈", "lincoln": "林肯",
+    "des moines": "得梅因", "fargo": "法戈", "sioux falls": "苏福尔斯",
+    "boise": "博伊西", "reno": "里诺", "spokane": "斯波坎",
+    "tacoma": "塔科马", "eugene": "尤金", "salem": "塞勒姆",
+    "bend": "本德", "medford": "梅德福", "juneau": "朱诺",
+    "fairbanks": "费尔班克斯", "billings": "比林斯",
+    "missoula": "米苏拉", "cheyenne": "夏延", "casper": "卡斯珀",
+    "santa fe": "圣菲", "flagstaff": "弗拉格斯塔夫", "mesa": "梅萨",
+    "scottsdale": "斯科茨代尔", "chandler": "钱德勒",
+    "glendale": "格伦代尔", "henderson": "亨德森",
+    "north las vegas": "北拉斯维加斯", "ogden": "奥格登",
+    "provo": "普罗沃", "sandy": "桑迪", "orem": "奥勒姆",
+    "layton": "莱顿", "logan": "洛根", "st. george": "圣乔治",
+    "idaho falls": "爱达荷福尔斯", "nampa": "南帕",
+    "meridian": "梅里迪安", "pocatello": "波卡特洛",
+    "twin falls": "双子瀑布",
+    # 日本
+    "tokyo": "东京", "osaka": "大阪", "nagoya": "名古屋", "kyoto": "京都",
+    "yokohama": "横滨", "kobe": "神户", "fukuoka": "福冈", "sapporo": "札幌",
+    "sendai": "仙台", "hiroshima": "广岛", "nara": "奈良",
+    "kanagawa": "神奈川", "chiba": "千叶", "saitama": "埼玉",
+    "aichi": "爱知", "hyogo": "兵库", "hokkaido": "北海道",
+    # 韩国 / 朝鲜
+    "seoul": "首尔", "busan": "釜山", "incheon": "仁川", "daegu": "大邱",
+    "daejeon": "大田", "gwangju": "光州", "ulsan": "蔚山", "suwon": "水原",
+    "gyeonggi": "京畿", "pyongyang": "平壤",
+    # 中国城市与省份（ip-api 返回英文名）
+    "beijing": "北京", "shanghai": "上海", "guangzhou": "广州",
+    "shenzhen": "深圳", "chengdu": "成都", "chongqing": "重庆",
+    "wuhan": "武汉", "xi'an": "西安", "hangzhou": "杭州", "nanjing": "南京",
+    "tianjin": "天津", "suzhou": "苏州", "zhengzhou": "郑州",
+    "changsha": "长沙", "qingdao": "青岛", "dalian": "大连",
+    "xiamen": "厦门", "fuzhou": "福州", "harbin": "哈尔滨",
+    "changchun": "长春", "shenyang": "沈阳", "jinan": "济南",
+    "hefei": "合肥", "kunming": "昆明", "guiyang": "贵阳",
+    "nanning": "南宁", "haikou": "海口", "lanzhou": "兰州",
+    "xining": "西宁", "yinchuan": "银川", "hohhot": "呼和浩特",
+    "urumqi": "乌鲁木齐", "lhasa": "拉萨", "taipei": "台北",
+    "kaohsiung": "高雄", "taichung": "台中", "tainan": "台南",
+    "hong kong": "香港", "macau": "澳门",
+    "guangdong": "广东", "zhejiang": "浙江", "jiangsu": "江苏",
+    "fujian": "福建", "shandong": "山东", "sichuan": "四川",
+    "hubei": "湖北", "hunan": "湖南", "henan": "河南", "hebei": "河北",
+    "shanxi": "山西", "shaanxi": "陕西", "liaoning": "辽宁",
+    "jilin": "吉林", "heilongjiang": "黑龙江", "anhui": "安徽",
+    "jiangxi": "江西", "yunnan": "云南", "guizhou": "贵州",
+    "guangxi": "广西", "hainan": "海南", "gansu": "甘肃",
+    "qinghai": "青海", "ningxia": "宁夏", "xinjiang": "新疆",
+    "inner mongolia": "内蒙古", "tibet": "西藏",
+    "nanchang": "南昌", "dongguan": "东莞", "foshan": "佛山",
+    "wuxi": "无锡", "ningbo": "宁波", "wenzhou": "温州",
+    "changzhou": "常州", "nantong": "南通", "yangzhou": "扬州",
+    "xuzhou": "徐州", "yantai": "烟台", "weifang": "潍坊",
+    "luoyang": "洛阳", "baoding": "保定", "tangshan": "唐山",
+    "huizhou": "惠州", "zhuhai": "珠海", "shantou": "汕头",
+    # 港澳台地区
+    "new taipei": "新北", "taoyuan": "桃园", "hsinchu": "新竹",
+    "keelung": "基隆", "chiayi": "嘉义", "kowloon": "九龙",
+    "new territories": "新界",
+    # 东南亚 / 南亚
+    "singapore": "新加坡", "kuala lumpur": "吉隆坡", "bangkok": "曼谷",
+    "jakarta": "雅加达", "manila": "马尼拉", "hanoi": "河内",
+    "ho chi minh city": "胡志明市", "new delhi": "新德里", "delhi": "德里",
+    "mumbai": "孟买", "bangalore": "班加罗尔", "bengaluru": "班加罗尔",
+    "karachi": "卡拉奇", "islamabad": "伊斯兰堡", "dhaka": "达卡",
+    "colombo": "科伦坡", "kathmandu": "加德满都", "yangon": "仰光",
+    "phnom penh": "金边", "vientiane": "万象", "bandung": "万隆",
+    "surabaya": "泗水", "cebu": "宿务", "chiang mai": "清迈",
+    "pattaya": "芭提雅", "penang": "槟城", "johor bahru": "新山",
+    # 欧洲
+    "london": "伦敦", "paris": "巴黎", "berlin": "柏林",
+    "madrid": "马德里", "rome": "罗马", "amsterdam": "阿姆斯特丹",
+    "brussels": "布鲁塞尔", "vienna": "维也纳", "zurich": "苏黎世",
+    "geneva": "日内瓦", "stockholm": "斯德哥尔摩", "oslo": "奥斯陆",
+    "copenhagen": "哥本哈根", "helsinki": "赫尔辛基", "dublin": "都柏林",
+    "lisbon": "里斯本", "athens": "雅典", "warsaw": "华沙",
+    "prague": "布拉格", "budapest": "布达佩斯", "moscow": "莫斯科",
+    "istanbul": "伊斯坦布尔", "ankara": "安卡拉", "frankfurt": "法兰克福",
+    "frankfurt am main": "法兰克福", "munich": "慕尼黑", "hamburg": "汉堡",
+    "cologne": "科隆", "stuttgart": "斯图加特",
+    "dusseldorf": "杜塞尔多夫", "leipzig": "莱比锡",
+    "lyon": "里昂", "marseille": "马赛", "nice": "尼斯",
+    "toulouse": "图卢兹", "bordeaux": "波尔多", "nantes": "南特",
+    "manchester": "曼彻斯特", "birmingham": "伯明翰", "leeds": "利兹",
+    "glasgow": "格拉斯哥", "edinburgh": "爱丁堡", "liverpool": "利物浦",
+    "bristol": "布里斯托", "milan": "米兰", "naples": "那不勒斯",
+    "turin": "都灵", "venice": "威尼斯", "florence": "佛罗伦萨",
+    "barcelona": "巴塞罗那", "valencia": "瓦伦西亚", "seville": "塞维利亚",
+    "bilbao": "毕尔巴鄂", "malaga": "马拉加", "porto": "波尔图",
+    "krakow": "克拉科夫", "gdansk": "格但斯克", "rotterdam": "鹿特丹",
+    "the hague": "海牙", "utrecht": "乌得勒支", "antwerp": "安特卫普",
+    "zagreb": "萨格勒布", "belgrade": "贝尔格莱德", "sofia": "索菲亚",
+    "bucharest": "布加勒斯特", "kyiv": "基辅", "kiev": "基辅",
+    "minsk": "明斯克", "tbilisi": "第比利斯", "yerevan": "埃里温",
+    "baku": "巴库", "almaty": "阿拉木图", "tashkent": "塔什干",
+    "england": "英格兰", "scotland": "苏格兰", "wales": "威尔士",
+    "bavaria": "巴伐利亚", "north rhine-westphalia": "北莱茵-威斯特法伦",
+    "baden-wurttemberg": "巴登-符腾堡", "hesse": "黑森",
+    "ile-de-france": "法兰西岛", "catalonia": "加泰罗尼亚",
+    "andalusia": "安达卢西亚", "lombardy": "伦巴第",
+    # 中东 / 非洲 / 大洋洲 / 拉美
+    "dubai": "迪拜", "abu dhabi": "阿布扎比", "doha": "多哈",
+    "riyadh": "利雅得", "jeddah": "吉达", "tel aviv": "特拉维夫",
+    "jerusalem": "耶路撒冷", "cairo": "开罗", "lagos": "拉各斯",
+    "nairobi": "内罗毕", "johannesburg": "约翰内斯堡",
+    "cape town": "开普敦", "casablanca": "卡萨布兰卡",
+    "toronto": "多伦多", "vancouver": "温哥华", "montreal": "蒙特利尔",
+    "ottawa": "渥太华", "calgary": "卡尔加里", "edmonton": "埃德蒙顿",
+    "ontario": "安大略", "quebec": "魁北克",
+    "british columbia": "不列颠哥伦比亚", "alberta": "艾伯塔",
+    "manitoba": "马尼托巴", "saskatchewan": "萨斯喀彻温",
+    "nova scotia": "新斯科舍", "new brunswick": "新不伦瑞克",
+    "mexico city": "墨西哥城", "guadalajara": "瓜达拉哈拉",
+    "sao paulo": "圣保罗", "rio de janeiro": "里约热内卢",
+    "buenos aires": "布宜诺斯艾利斯", "santiago": "圣地亚哥",
+    "lima": "利马", "bogota": "波哥大",
+    "sydney": "悉尼", "melbourne": "墨尔本", "brisbane": "布里斯班",
+    "perth": "珀斯", "adelaide": "阿德莱德", "canberra": "堪培拉",
+    "auckland": "奥克兰", "wellington": "惠灵顿",
+    "christchurch": "基督城", "hamilton": "汉密尔顿",
+    "new south wales": "新南威尔士", "victoria": "维多利亚",
+    "queensland": "昆士兰", "western australia": "西澳大利亚",
+    "south australia": "南澳大利亚", "tasmania": "塔斯马尼亚",
+}
+
+# 运营商 / 组织（关键字小写 → 中文名）。按顺序匹配，先命中先返回；
+# 没有中文通称的品牌（如 Cloudflare、GitHub）不列入，保留原文。
+ORGS = [
+    ("alibaba cloud", "阿里云"),
+    ("alibaba", "阿里巴巴"),
+    ("tencent cloud", "腾讯云"),
+    ("tencent", "腾讯"),
+    ("baidu", "百度"),
+    ("huawei cloud", "华为云"),
+    ("huawei", "华为"),
+    ("jd cloud", "京东云"),
+    ("jingdong", "京东"),
+    ("jd.com", "京东"),
+    ("bytedance", "字节跳动"),
+    ("xiaomi", "小米"),
+    ("meituan", "美团"),
+    ("pinduoduo", "拼多多"),
+    ("netease", "网易"),
+    ("sina", "新浪"),
+    ("ucloud", "优刻得"),
+    ("qingcloud", "青云"),
+    ("kingsoft", "金山云"),
+    ("google", "谷歌"),
+    ("oracle", "甲骨文"),
+    ("amazon", "亚马逊"),
+    ("microsoft", "微软"),
+    ("apple", "苹果"),
+    ("samsung", "三星"),
+    ("intel", "英特尔"),
+    ("cisco", "思科"),
+    ("dell", "戴尔"),
+    ("hewlett", "惠普"),
+    ("hp inc", "惠普"),
+    ("lenovo", "联想"),
+    ("asus", "华硕"),
+    ("acer", "宏碁"),
+    ("zte", "中兴"),
+    ("h3c", "新华三"),
+    ("china telecom", "中国电信"),
+    ("chinanet", "中国电信"),
+    ("china unicom", "中国联通"),
+    ("china mobile", "中国移动"),
+    ("china education", "中国教育网"),
+    ("cernet", "中国教育网"),
+    ("china science", "中国科技网"),
+    ("cstnet", "中国科技网"),
+    ("great wall broadband", "长城宽带"),
+    ("dr. peng", "鹏博士"),
+    ("wasu", "华数"),
+    ("pccw", "电讯盈科"),
+    ("chunghwa", "中华电信"),
+    ("hinet", "中华电信"),
+    ("softbank", "软银"),
+    ("rakuten", "乐天"),
+    ("yahoo japan", "雅虎日本"),
+    ("yahoo", "雅虎"),
+    ("korea telecom", "韩国电信"),
+    ("kt corporation", "韩国电信"),
+    ("sk broadband", "SK宽带"),
+    ("singtel", "新加坡电信"),
+    ("starhub", "星和"),
+    ("deutsche telekom", "德国电信"),
+    ("vodafone", "沃达丰"),
+    ("telefonica", "西班牙电信"),
+    ("british telecommunications", "英国电信"),
+    ("bt group", "英国电信"),
+    ("bell canada", "加拿大贝尔"),
+    ("level 3", "Lumen"),
+    ("meta platforms", "Meta"),
+]
+
+
+def _js(obj):
+    return json.dumps(obj, ensure_ascii=False)
+
+
+def build_block():
+    # 去重：同一代码/英文名只保留第一次出现，避免 JS 对象字面量重复键警告
+    country_map, country_name_map, country_en_map = {}, {}, {}
+    for c, en, zh in COUNTRIES:
+        country_map.setdefault(c, zh)
+        country_name_map.setdefault(en.lower(), zh)
+        country_en_map.setdefault(c, en)
+    country = "{" + ",".join(
+        _js(c) + ":" + _js(zh) for c, zh in country_map.items()) + "}"
+    country_name = "{" + ",".join(
+        _js(n) + ":" + _js(zh) for n, zh in country_name_map.items()) + "}"
+    country_en = "{" + ",".join(
+        _js(c) + ":" + _js(en) for c, en in country_en_map.items()) + "}"
+    place = "{" + ",".join(
+        _js(k) + ":" + _js(v) for k, v in PLACES.items()) + "}"
+    org = "[" + ",".join(
+        "[" + _js(k) + "," + _js(v) + "]" for k, v in ORGS) + "]"
+    lines = [
+        "var CN_COUNTRY=" + country + ";",
+        "var CN_COUNTRY_NAME=" + country_name + ";",
+        "var CN_COUNTRY_EN=" + country_en + ";",
+        "var CN_PLACE=" + place + ";",
+        "var CN_ORG=" + org + ";",
+        "function cnCountry(code,name){var c=String(code||'').toUpperCase();"
+        "if(CN_COUNTRY[c])return CN_COUNTRY[c];return cnCountryName(name);}",
+        "function cnCountryName(name){if(!name)return '';"
+        "var n=String(name).toLowerCase().trim();return CN_COUNTRY_NAME[n]||name;}",
+        "function cnPlace(name){if(!name)return '';"
+        "var n=String(name).toLowerCase().trim();return CN_PLACE[n]||name;}",
+        "function cnOrg(s){if(!s)return '';"
+        "var v=String(s).replace(/^AS\\d+\\s+/i,'').trim();var l=v.toLowerCase();"
+        "for(var i=0;i<CN_ORG.length;i++){if(l.indexOf(CN_ORG[i][0])>=0)return CN_ORG[i][1];}"
+        "return v;}",
+        "function cnGeo(d){return {country:cnCountry(d.countryCode,d.country),"
+        "region:cnPlace(d.region),city:cnPlace(d.city),"
+        "isp:cnOrg(d.isp),org:cnOrg(d.org)};}",
+        "function withCn(d){var g=cnGeo(d);var cc=String(d.countryCode||'').toUpperCase();"
+        "return {countryCn:g.country,countryEn:(CN_COUNTRY_EN[cc]||d.country),"
+        "regionCn:g.region,cityCn:g.city,ispCn:g.isp,orgCn:g.org};}",
+    ]
+    return "\n".join(lines)
+
+
+def inject(path, begin, end, anchor):
+    with open(path, encoding="utf-8") as f:
+        src = f.read()
+    block = build_block()
+    if begin in src and end in src:
+        src = re.sub(re.escape(begin) + r"[\s\S]*?" + re.escape(end),
+                     lambda _m: begin + "\n" + block + "\n" + end, src, count=1)
+    else:
+        src = src.replace(anchor, begin + "\n" + block + "\n" + end + "\n" + anchor, 1)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(src)
+    print("injected:", path)
+
+
+if __name__ == "__main__":
+    import os
+    here = os.path.dirname(os.path.abspath(__file__))
+    base = os.path.dirname(here)
+    inject(os.path.join(base, "src", "index.js"),
+           "// __CN_NAMES_BEGIN__", "// __CN_NAMES_END__",
+           "function normalizeIpApi(d) {")
+    inject(os.path.join(base, "public", "index.html"),
+           "/* __CN_NAMES_BEGIN__ */", "/* __CN_NAMES_END__ */",
+           "  var urlLang=null;")
+    print("done: countries=%d places=%d orgs=%d"
+          % (len(COUNTRIES), len(PLACES), len(ORGS)))
