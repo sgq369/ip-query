@@ -17,3 +17,14 @@ print(proc.stdout)
 print("--- wrangler stderr ---")
 print(proc.stderr)
 print("exit code:", proc.returncode)
+if proc.returncode == 0:
+    # 部署完清一次边缘缓存：SSR HTML 带 s-maxage=86400，不清就继续发旧版
+    purge = subprocess.run(
+        [sys.executable, "tools/purge-cache.py"],
+        cwd="/home/hatch/workspace/build/website/ip-query",
+        env=env, capture_output=True, text=True, timeout=120)
+    print("--- purge-cache stdout ---")
+    print(purge.stdout)
+    print("--- purge-cache stderr ---")
+    print(purge.stderr)
+    print("purge exit code:", purge.returncode)
