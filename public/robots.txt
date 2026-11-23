@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /ipv4
+Disallow: /ipv6
+Disallow: /geo
+
+Sitemap: https://ip.sungongqin.com/sitemap.xml

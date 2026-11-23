@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IP 查询 · 钦律亲为</title>
+<meta name="description" content="免费 IP 查询：归属地、ASN、运营商、时区、经纬度。支持 IP、域名、ASN 查询。">
+<link rel="canonical" href="https://ip.sungongqin.com/">
+<link rel="alternate" hreflang="zh-CN" href="https://ip.sungongqin.com/">
+<link rel="alternate" hreflang="en" href="https://ip.sungongqin.com/?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://ip.sungongqin.com/">
+<meta name="theme-color" content="#0D9488">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="钦律亲为">
+<meta property="og:title" content="IP 查询 · 钦律亲为">
+<meta property="og:description" content="免费 IP 查询：归属地、ASN、运营商、时区、经纬度。支持 IP、域名、ASN 查询。">
+<meta property="og:url" content="https://ip.sungongqin.com/">
+<meta property="og:image" content="https://ip.sungongqin.com/og.png">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="IP 查询 · 钦律亲为">
+<meta name="twitter:description" content="免费 IP 查询：归属地、ASN、运营商、时区、经纬度。支持 IP、域名、ASN 查询。">
+<meta name="twitter:image" content="https://ip.sungongqin.com/og.png">
+<script type="application/ld+json" id="ldjson">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"钦律亲为 IP 查询","alternateName":"Qinlv IP Lookup","url":"https://ip.sungongqin.com/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"},"inLanguage":["zh-CN","en"]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"如何查询我的 IP 地址？","acceptedAnswer":{"@type":"Answer","text":"打开本站即自动显示你的 IP；也可以在搜索框输入任意 IP、域名或 ASN 查询。"}},{"@type":"Question","name":"IP 纯净度评分是什么意思？","acceptedAnswer":{"@type":"Answer","text":"本站自定规则的参考性指标：基础 100 分，代理、机房、泄露等信号扣分，非官方评分。"}},{"@type":"Question","name":"支持 IPv6 查询吗？","acceptedAnswer":{"@type":"Answer","text":"支持，IPv4、IPv6、域名与 ASN 都可以查询。"}}]}]}</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "fa6b7ea0ad0943cd95c45717faa3eeb1"}'></script>
+<style>
+:root{--primary:#14B8A6;--primary-deep:#0F766E;--bg:#0A0F12;--card:#0F1618;--elev:#131D1F;--border:rgba(45,212,191,.14);--text:#fff;--muted:rgba(255,255,255,.65);--radius:14px}
+[data-theme="light"]{--bg:#FAFAFA;--card:#fff;--elev:#F5F5F5;--border:rgba(13,148,136,.16);--text:#0F172A;--muted:rgba(15,23,42,.65)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Noto Sans SC",-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:var(--primary);text-decoration:none}
+.wrap{max-width:860px;margin:0 auto;padding:28px 18px 60px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}
+.logo{font-size:20px;font-weight:800}.logo span{color:var(--primary)}
+.theme-btn{background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:6px 14px;cursor:pointer;font-size:13px}
+h1{font-size:28px;letter-spacing:-.02em;margin-bottom:6px}
+.sub{color:var(--muted);font-size:14px;margin-bottom:20px}
+.search{display:flex;gap:10px}
+.search input{flex:1;background:var(--card);border:2px solid var(--primary);border-radius:12px;padding:13px 16px;font-size:16px;color:var(--text);outline:none;min-width:0}
+.search button{background:var(--primary);color:#fff;border:none;border-radius:12px;padding:0 26px;font-size:16px;font-weight:700;cursor:pointer}
+.search button:hover{background:var(--primary-deep)}
+.examples{margin-top:12px;font-size:13px;color:var(--muted)}
+.examples button{background:none;border:1px solid var(--border);color:var(--muted);border-radius:999px;padding:2px 10px;margin:0 4px 4px 0;cursor:pointer;font-size:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-top:20px}
+.big-ip{font-size:30px;font-weight:800;font-family:ui-monospace,Menlo,Consolas,monospace;word-break:break-all}
+.big-ip small{font-size:14px;color:var(--muted);font-weight:400}
+.copy{background:var(--elev);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:4px 12px;cursor:pointer;font-size:13px;margin-left:10px;vertical-align:middle}
+.badges{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
+.badge{font-size:12px;border-radius:999px;padding:3px 11px;border:1px solid var(--border);color:var(--muted)}
+.badge.hot{color:#F87171;border-color:rgba(248,113,113,.4)}
+.badge.ok{color:#34D399;border-color:rgba(52,211,153,.4)}
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:15px}
+td{padding:9px 4px;border-bottom:1px solid var(--border);vertical-align:top}
+td:first-child{color:var(--muted);width:110px;white-space:nowrap}
+td:last-child{word-break:break-all}
+.map{width:100%;height:260px;border:0;border-radius:10px;margin-top:14px}
+.muted{color:var(--muted);font-size:13px}
+.loading{color:var(--muted);padding:30px 0;text-align:center}
+.error{color:#F87171}
+.warn{color:#FBBF24}
+.ok{color:#34D399}
+.src-wrap{overflow-x:auto;margin-top:14px}
+.src-wrap table{min-width:560px;font-size:13px}
+.src-wrap th{text-align:left;color:var(--muted);font-weight:600;padding:8px 8px 8px 0;border-bottom:1px solid var(--border);white-space:nowrap}
+.src-wrap td{padding:8px 8px 8px 0;font-size:13px}
+.src-wrap td:first-child{width:90px}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+h2{font-size:17px;margin:26px 0 8px}
+.api{font-size:14px}
+.api code{background:var(--elev);border:1px solid var(--border);border-radius:6px;padding:2px 7px;font-size:13px;word-break:break-all}
+.api pre{background:var(--elev);border:1px solid var(--border);border-radius:10px;padding:12px;overflow-x:auto;font-size:13px;margin:8px 0}
+footer{margin-top:40px;font-size:13px;color:var(--muted);text-align:center}
+footer a{color:var(--muted);text-decoration:underline}
+@media(max-width:600px){.big-ip{font-size:24px}.search{flex-direction:column}.search button{padding:12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo">钦律亲为 <span data-i18n="brandSuffix">· IP 查询</span></div>
+  <div style="display:flex;gap:8px">
+    <button class="theme-btn" id="langBtn" type="button">English</button>
+    <button class="theme-btn" id="themeBtn" type="button">浅色</button>
+  </div>
+</header>
+
+<h1 data-i18n="h1">IP 地址查询</h1>
+<p class="sub" data-i18n="sub">打开即显示你的 IP；也可以查任意 IP、域名或 ASN（例如 AS15169）。</p>
+
+<form class="search" id="form">
+  <input id="q" type="text" data-i18n-ph="searchPh" placeholder="输入 IP、域名或 ASN，例如 8.8.8.8" autocomplete="off" spellcheck="false">
+  <button type="submit" data-i18n="searchBtn">查询</button>
+</form>
+<div class="examples"><span data-i18n="tryLabel">试试：</span>
+  <button type="button" data-q="8.8.8.8">8.8.8.8</button>
+  <button type="button" data-q="1.1.1.1">1.1.1.1</button>
+  <button type="button" data-q="223.5.5.5">223.5.5.5</button>
+  <button type="button" data-q="AS15169">AS15169</button>
+  <button type="button" data-q="dns.google">dns.google</button>
+</div>
+
+<div id="result"></div>
+<div id="purity"></div>
+<div id="rdap"></div>
+<div id="dnsmulti"></div>
+<div id="leak"></div>
+<div id="outbound"></div>
+
+<div class="card">
+  <h2 style="margin-top:0" data-i18n="recent">最近查询</h2>
+  <div id="recent" class="muted">暂无</div>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0" data-i18n="calcTitle">IP 计算器</h2>
+  <p class="muted" data-i18n="calcDesc">纯本地计算，不联网。输入 IP 或 CIDR，例如 192.168.1.10/24、8.8.8.8/24、2001:db8::/32。</p>
+  <form class="search" id="calcForm" style="margin-top:12px">
+    <input id="calcInput" type="text" data-i18n-ph="calcPh" placeholder="192.168.1.10/24" autocomplete="off" spellcheck="false">
+    <button type="submit" data-i18n="calcBtn">计算</button>
+  </form>
+  <div class="examples"><span data-i18n="tryLabel">试试：</span>
+    <button type="button" data-calc="192.168.1.10/24">192.168.1.10/24</button>
+    <button type="button" data-calc="10.0.0.1/8">10.0.0.1/8</button>
+    <button type="button" data-calc="8.8.8.8">8.8.8.8</button>
+    <button type="button" data-calc="2001:db8::1/32">2001:db8::1/32</button>
+  </div>
+  <div id="calcResult"></div>
+</div>
+
+<footer>
+  <a href="https://sungongqin.com" data-i18n="back">← 返回钦律亲为</a>
+</footer>
+</div>
+
+<script>
+(function(){
+  // ---- 中英双语：默认按访客 IP 定语言（中国大陆/港澳台 → 中文，其他 → 英文），右上角可手动切换并记住选择 ----
+  var I18N={
+  zh:{title:'IP 查询 · 钦律亲为',brandSuffix:'· IP 查询',h1:'IP 地址查询',sub:'打开即显示你的 IP；也可以查任意 IP、域名或 ASN（例如 AS15169）。',searchPh:'输入 IP、域名或 ASN，例如 8.8.8.8',searchBtn:'查询',tryLabel:'试试：',recent:'最近查询',none:'暂无',calcTitle:'IP 计算器',calcDesc:'纯本地计算，不联网。输入 IP 或 CIDR，例如 192.168.1.10/24、8.8.8.8/24、2001:db8::/32。',calcPh:'192.168.1.10/24',calcBtn:'计算',back:'← 返回钦律亲为',loading:'查询中…',copy:'复制',copied:'已复制',yourIp:'这是你当前访问的 IP',loc:'归属地',country:'国家 / 代码',cityZip:'城市 / 邮编',latlon:'经纬度',tz:'时区',isp:'运营商',org:'组织',asn:'ASN',hostname:'主机名',source:'数据来源',badgeIdc:'IDC 机房 IP',badgeProxy:'代理 IP',badgeMobile:'移动网络',badgeHome:'普通宽带 / 家庭宽带',badgeSusProxy:'疑似代理',badgeMobileNet:'移动设备网络',viewOsm:'在 OpenStreetMap 上查看 →',asnHolder:'持有者',asnAnnounced:'是否广播',yes:'是',no:'否',asnPrefixes:'已广播网段（前 10）',rdapTitle:'WHOIS / RDAP 注册信息',rdapType:'类型',rdapHandle:'句柄',rdapName:'名称',rdapRange:'网段范围',rdapCidr:'CIDR',rdapStatus:'状态',rdapReg:'注册时间',rdapChanged:'最后变更',rdapAbuse:'滥用举报',rdapEntities:'相关实体',rdapSource:'rdap.org（各 RIR 权威注册库）',rdapUnavailable:'RDAP 注册信息暂不可用（上游限流），稍后刷新再试。',dnsTitle:'DNS 多解析器对照',dnsDomainNote:'查询 {d} 的 A / AAAA 记录；四家解析器结果不一致可能意味着劫持或污染，请以多数为准。',dnsPtrNote:'反向解析（PTR）对照：{d}',dnsA:'A 记录',dnsAaaa:'AAAA 记录',dnsMismatch:'⚠ 不一致',dnsResolver:'解析器',dnsHostname:'主机名',leakTitle:'泄露检测',leakNote:'针对你当前的上网环境，与上方查询的 IP 无关。只做检测，不做纯净度评分。',leakRetry:'重新检测',leakWebrtc:'WebRTC',leakDns:'DNS',leakResolver:'DNS 解析器',leakVerdict:'结论',leakNoSupport:'浏览器不支持 WebRTC 检测',leakFound:'⚠ 检测到泄露',leakOkIp:'未检测到泄露',leakOkNone:'未检测到泄露',leakCandidates:'候选地址',leakDnsSame:'解析器与出口 IP 一致，未见泄露。',leakDnsDiff:'解析器 IP 与出口 IP 不同——如果你在用 VPN/代理而 DNS 走了本地运营商，可能存在 DNS 泄露；若 DNS 本就是你手动指定的公共 DNS（如 8.8.8.8），属于正常。',leakDnsNoResult:'检测无结果（edns.ip-api.com 返回异常）',leakDnsFail:'检测失败（edns.ip-api.com 不可达）',outTitle:'出口检测',outNote:'针对你当前的上网环境：各回显服务看到的出口 IP 是否一致，以及各大站点的连通与延迟。',outSame:'各服务看到的出口 IP 一致。',outDiff:'⚠ 各服务看到的出口 IP 不一致，可能存在分流或多出口。',outSite:'站点',outLatency:'延迟',outDown:'不通 / 超时',calcBadFormat:'格式不对：输入 IP 或 CIDR，例如 192.168.1.10/24',calcBadV4:'IPv4 地址不对：{ip}',calcBadV6Prefix:'IPv6 前缀应在 0–128 之间',calcBadV4Prefix:'IPv4 前缀应在 0–32 之间',calcIp:'IP 地址',calcMask:'子网掩码',calcWildcard:'通配符掩码',calcNetwork:'网络地址',calcBroadcast:'广播地址',calcUsable:'可用主机数',calcRange:'可用范围',calcInt:'IP 转整数',calcHex:'IP 转十六进制',calcCidr:'CIDR 表示',calcTotal:'（共 {n} 个地址）',calcFull:'完整地址',calcNetAddr:'网络地址 /{p}',calcPrefix:'前缀长度',calcTotalAddr:'地址总数',calcIntV6:'仅 IPv4 支持',errNoIp:'拿不到你的 IP',errNoIpRetry:'拿不到你的 IP，请刷新再试',errLookup:'查询失败，请稍候再试',errAsn:'ASN 查询失败',errDomain:'域名解析不到 IP：{q}',themeLight:'浅色',themeDark:'深色',domainTo:'域名 {q} 解析到 {ip}{more}',moreCount:'（共 {n} 个）',leakFoundDetail:'STUN 暴露了 {ips}，与当前出口 IP 不同',leakOkIpDetail:'只看到当前出口 IP {ip}',leakOkNoneDetail:'未收集到公网候选地址（浏览器已用 mDNS 隐藏真实 IP）',leakLoading:'检测中…',desc:'免费 IP 查询：归属地、ASN、运营商、时区、经纬度。支持 IP、域名、ASN 查询。',purityTitle:'IP 纯净度评分',purityNote:'本站自定规则，仅供参考，非官方评分。基础 100 分，按下列信号扣分。',puritySelfNote:'含你当前连接的泄露与出口检测结果。',purityOtherNote:'仅基于该 IP 的查询信号；泄露与出口检测只针对你自己的连接，不计入。',purityPending:'检测中…',grade5:'优秀',grade4:'良好',grade3:'一般',grade2:'较差',grade1:'高风险',dedProxy:'代理 IP',dedHosting:'托管 / 机房 IP',dedIdc:'机房组织',dedWebrtc:'WebRTC 泄露',dedDns:'DNS 泄露',dedExit:'出口不一致',dedProxyEx:'该 IP 被识别为代理出口。',dedHostingEx:'该 IP 属于托管或机房网段，非家庭宽带。',dedIdcEx:'所属组织为云厂商或机房运营商。',dedWebrtcEx:'STUN 暴露了与出口不同的真实 IP。',dedDnsEx:'DNS 解析走了与出口不同的运营商。',dedExitEx:'不同回显服务看到的出口 IP 不一致。'},
+  en:{title:'IP Lookup · Qinlv',brandSuffix:'· IP Lookup',h1:'IP Address Lookup',sub:'Your IP shows automatically; you can also look up any IP, domain or ASN (e.g. AS15169).',searchPh:'Enter an IP, domain or ASN, e.g. 8.8.8.8',searchBtn:'Lookup',tryLabel:'Try:',recent:'Recent lookups',none:'None yet',calcTitle:'IP Calculator',calcDesc:'Calculated locally in your browser, no network. Enter an IP or CIDR, e.g. 192.168.1.10/24, 8.8.8.8/24, 2001:db8::/32.',calcPh:'192.168.1.10/24',calcBtn:'Calculate',back:'← Back to Qinlv',loading:'Looking up…',copy:'Copy',copied:'Copied',yourIp:'This is the IP you are visiting from',loc:'Location',country:'Country / Code',cityZip:'City / ZIP',latlon:'Latitude / Longitude',tz:'Timezone',isp:'ISP',org:'Organization',asn:'ASN',hostname:'Hostname',source:'Source',badgeIdc:'Datacenter IP',badgeProxy:'Proxy IP',badgeMobile:'Mobile network',badgeHome:'Residential / Broadband',badgeSusProxy:'Suspected proxy',badgeMobileNet:'Mobile device network',viewOsm:'View on OpenStreetMap →',asnHolder:'Holder',asnAnnounced:'Announced',yes:'Yes',no:'No',asnPrefixes:'Announced prefixes (first 10)',rdapTitle:'WHOIS / RDAP Registration',rdapType:'Type',rdapHandle:'Handle',rdapName:'Name',rdapRange:'Address range',rdapCidr:'CIDR',rdapStatus:'Status',rdapReg:'Registered',rdapChanged:'Last changed',rdapAbuse:'Abuse contact',rdapEntities:'Related entities',rdapSource:'rdap.org (authoritative RIR registries)',rdapUnavailable:'RDAP data is temporarily unavailable (upstream rate limit). Please refresh later.',dnsTitle:'Multi-Resolver DNS Comparison',dnsDomainNote:'A / AAAA records for {d}. If the four resolvers disagree, it may indicate hijacking or pollution — trust the majority.',dnsPtrNote:'Reverse (PTR) lookup: {d}',dnsA:'A records',dnsAaaa:'AAAA records',dnsMismatch:'⚠ Mismatch',dnsResolver:'Resolver',dnsHostname:'Hostname',leakTitle:'Leak Detection',leakNote:'Tests your current connection, not the IP looked up above. Detection only — no purity score.',leakRetry:'Test again',leakWebrtc:'WebRTC',leakDns:'DNS',leakResolver:'DNS resolver',leakVerdict:'Verdict',leakNoSupport:'This browser does not support WebRTC detection',leakFound:'⚠ Leak detected',leakOkIp:'No leak detected',leakOkNone:'No leak detected',leakCandidates:'Candidates',leakDnsSame:'Resolver matches your exit IP. No leak seen.',leakDnsDiff:'The resolver IP differs from your exit IP. If you use a VPN/proxy but DNS goes through your local ISP, DNS may be leaking. If you manually set a public DNS (e.g. 8.8.8.8), this is normal.',leakDnsNoResult:'No result (edns.ip-api.com returned an unexpected response)',leakDnsFail:'Test failed (edns.ip-api.com unreachable)',outTitle:'Exit Detection',outNote:'For your current connection: do echo services see the same exit IP, and how reachable/fast are major sites?',outSame:'All services see the same exit IP.',outDiff:'⚠ Services see different exit IPs — split tunneling or multiple exits possible.',outSite:'Site',outLatency:'Latency',outDown:'Unreachable / Timeout',calcBadFormat:'Invalid format: enter an IP or CIDR, e.g. 192.168.1.10/24',calcBadV4:'Invalid IPv4 address: {ip}',calcBadV6Prefix:'IPv6 prefix must be 0–128',calcBadV4Prefix:'IPv4 prefix must be 0–32',calcIp:'IP address',calcMask:'Netmask',calcWildcard:'Wildcard mask',calcNetwork:'Network address',calcBroadcast:'Broadcast address',calcUsable:'Usable hosts',calcRange:'Usable range',calcInt:'IP as integer',calcHex:'IP as hex',calcCidr:'CIDR notation',calcTotal:'(of {n} addresses)',calcFull:'Full address',calcNetAddr:'Network address /{p}',calcPrefix:'Prefix length',calcTotalAddr:'Total addresses',calcIntV6:'IPv4 only',errNoIp:'Could not get your IP',errNoIpRetry:'Could not get your IP. Please refresh and try again.',errLookup:'Lookup failed. Please try again later.',errAsn:'ASN lookup failed',errDomain:'Could not resolve domain to an IP: {q}',themeLight:'Light',themeDark:'Dark',domainTo:'Domain {q} resolves to {ip}{more}',moreCount:'(total {n})',leakFoundDetail:'STUN exposed {ips}, which differs from your exit IP',leakOkIpDetail:'Only your exit IP {ip} was seen',leakOkNoneDetail:'No public candidate gathered (the browser hides your real IP with mDNS)',leakLoading:'Testing…',desc:'Free IP lookup: location, ASN, ISP, timezone, coordinates. Supports IP, domain and ASN lookup.',purityTitle:'IP Purity Score',purityNote:'Our own transparent rule, for reference only — not an official score. Starts at 100, deductions below.',puritySelfNote:'Includes leak and exit checks for your current connection.',purityOtherNote:'Based only on this IP\'s lookup signals; leak and exit checks apply to your own connection and are not counted.',purityPending:'Testing…',grade5:'Excellent',grade4:'Good',grade3:'Fair',grade2:'Poor',grade1:'High risk',dedProxy:'Proxy IP',dedHosting:'Hosting / datacenter IP',dedIdc:'Datacenter organization',dedWebrtc:'WebRTC leak',dedDns:'DNS leak',dedExit:'Exit IP mismatch',dedProxyEx:'This IP is identified as a proxy exit.',dedHostingEx:'This IP belongs to a hosting or datacenter range, not residential broadband.',dedIdcEx:'The owning organization is a cloud or datacenter operator.',dedWebrtcEx:'STUN exposed a real IP different from the exit IP.',dedDnsEx:'DNS queries went through a different ISP than the exit IP.',dedExitEx:'Echo services saw different exit IPs.'}
+  };
+  var urlLang=null;
+  try{var lp=new URLSearchParams(location.search).get('lang');if(lp==='zh'||lp==='en')urlLang=lp;}catch(e){}
+  var lang=urlLang||'zh';
+  try{var savedLang=localStorage.getItem('ip-lang');if(!urlLang&&(savedLang==='zh'||savedLang==='en'))lang=savedLang;}catch(e){}
+  function t(k){return (I18N[lang]&&I18N[lang][k])||I18N.zh[k]||k;}
+  function tf(k,v){var s=t(k);for(var key in v){s=s.split('{'+key+'}').join(v[key]);}return s;}
+  function applyLang(){
+    document.documentElement.lang=lang==='zh'?'zh-CN':'en';
+    document.title=t('title');
+    var meta=document.querySelector('meta[name="description"]');
+    if(meta)meta.setAttribute('content',t('desc'));
+    document.getElementById('langBtn').textContent=lang==='zh'?'English':'中文';
+    document.querySelectorAll('[data-i18n]').forEach(function(el){el.textContent=t(el.getAttribute('data-i18n'));});
+    document.querySelectorAll('[data-i18n-ph]').forEach(function(el){el.setAttribute('placeholder',t(el.getAttribute('data-i18n-ph')));});
+    syncBtn();
+    try{renderRecent();}catch(e){}
+  }
+  function detectLangFromIP(){
+    if(savedLang||urlLang)return;
+    fetch('/api/me').then(function(r){return r.json();}).then(function(d){
+      var cc=(d.countryCode||d.country||'').toUpperCase();
+      var next=(cc==='CN'||cc==='TW'||cc==='HK'||cc==='MO')?'zh':'en';
+      if(next!==lang){lang=next;applyLang();rerun();}
+    }).catch(function(){});
+  }
+  var root=document.documentElement;
+  try{var savedTheme=localStorage.getItem('ip-theme');if(savedTheme)root.setAttribute('data-theme',savedTheme);}catch(e){}
+  var btn=document.getElementById('themeBtn');
+  function syncBtn(){btn.textContent=root.getAttribute('data-theme')==='light'?t('themeDark'):t('themeLight');}
+  syncBtn();
+  btn.onclick=function(){var n=root.getAttribute('data-theme')==='light'?'dark':'light';root.setAttribute('data-theme',n);try{localStorage.setItem('ip-theme',n);}catch(e){}syncBtn();};
+  document.getElementById('langBtn').onclick=function(){
+    lang=lang==='zh'?'en':'zh';
+    try{localStorage.setItem('ip-lang',lang);}catch(e){}
+    var u=new URL(location.href);
+    if(lang==='en')u.searchParams.set('lang','en');else u.searchParams.delete('lang');
+    history.replaceState(null,'',u.pathname+u.search+(u.hash||''));
+    applyLang();rerun();
+  };
+  function rerun(){
+    var m=location.pathname.match(/^\/ip\/(.+)$/);
+    var q=m?decodeURIComponent(m[1]):(new URLSearchParams(location.search).get('q')||'');
+    if(q)go(q);else goMe();
+  }
+
+  var result=document.getElementById('result');
+  var input=document.getElementById('q');
+  var IP4=/^(?:\d{1,3}\.){3}\d{1,3}$/;
+
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function isIP(s){return IP4.test(s)||(s.indexOf(':')>=0&&/^[0-9a-fA-F:]+$/.test(s));}
+  function isASN(s){return /^AS?\d+$/i.test(s);}
+  function typeBadges(d){
+    var b=[];
+    // ip-api 的 hosting/proxy 标识最准；拿不到时（ipinfo 回退）按组织名启发式判断：
+    // 知名云厂商 / 机房运营商一律算 IDC，避免把 Google、Cloudflare 标成家庭宽带。
+    var hay=((d.org||'')+' '+(d.isp||'')+' '+(d.asname||'')).toLowerCase();
+    var idcKw=['google','cloudflare','amazon','aws','microsoft','azure','oracle','alibaba','tencent','digitalocean','linode','vultr','hetzner','ovh','akamai','fastly','cloud','datacenter','data center','hosting','server','cdn','choopa','constant company'];
+    var looksIdc=idcKw.some(function(k){return hay.indexOf(k)>=0;});
+    if(d.hosting||looksIdc)b.push('<span class="badge hot">'+esc(t('badgeIdc'))+'</span>');
+    else if(d.proxy)b.push('<span class="badge hot">'+esc(t('badgeProxy'))+'</span>');
+    else if(d.mobile)b.push('<span class="badge">'+esc(t('badgeMobile'))+'</span>');
+    else b.push('<span class="badge ok">'+esc(t('badgeHome'))+'</span>');
+    if(d.proxy)b.push('<span class="badge">'+esc(t('badgeSusProxy'))+'</span>');
+    if(d.mobile)b.push('<span class="badge">'+esc(t('badgeMobileNet'))+'</span>');
+    return b.join('');
+  }
+
+  // ---- 纯净度评分（本站自定透明规则：基础 100 分，按信号扣分；不是官方分）----
+  var purityState={lookup:null,self:false,webrtc:null,dns:null,exit:null};
+  function purityGrade(s){return s>=90?t('grade5'):s>=70?t('grade4'):s>=50?t('grade3'):s>=30?t('grade2'):t('grade1');}
+  function looksIdcOrg(d){return /google|cloudflare|amazon|microsoft|oracle|alibaba|tencent|cloud|hosting|cdn|datacenter|vultr|digitalocean|linode|ovh|hetzner|leaseweb|choopa/i.test((d.org||'')+' '+(d.isp||''));}
+  function renderPurity(){
+    var box=document.getElementById('purity');
+    if(!box)return;
+    var p=purityState;
+    if(!p.lookup){box.innerHTML='';return;}
+    var score=100, rows=[];
+    var d=p.lookup;
+    if(d.proxy){score-=40;rows.push([t('dedProxy'),'-40',t('dedProxyEx')]);}
+    else if(d.hosting){score-=40;rows.push([t('dedHosting'),'-40',t('dedHostingEx')]);}
+    else if(looksIdcOrg(d)){score-=25;rows.push([t('dedIdc'),'-25',t('dedIdcEx')]);}
+    if(p.self){
+      if(p.webrtc===true){score-=15;rows.push([t('dedWebrtc'),'-15',t('dedWebrtcEx')]);}
+      if(p.dns===true){score-=15;rows.push([t('dedDns'),'-15',t('dedDnsEx')]);}
+      if(p.exit===true){score-=10;rows.push([t('dedExit'),'-10',t('dedExitEx')]);}
+    }
+    if(score<0)score=0;
+    var pending=[];
+    if(p.self){
+      if(p.webrtc===null)pending.push(t('leakWebrtc'));
+      if(p.dns===null)pending.push(t('leakDns'));
+      if(p.exit===null)pending.push(t('outTitle'));
+    }
+    box.innerHTML='<div class="card"><h2 style="margin-top:0">'+esc(t('purityTitle'))+'</h2>'
+      +'<div style="font-size:40px;font-weight:800;color:var(--accent)">'+score+'<span style="font-size:16px;color:var(--muted)"> / 100 · '+esc(purityGrade(score))+'</span></div>'
+      +'<p class="muted">'+esc(t('purityNote'))+' '+esc(p.self?t('puritySelfNote'):t('purityOtherNote'))+'</p>'
+      +(rows.length?'<table>'+rows.map(function(r){return '<tr><td>'+esc(r[0])+'<br><span class="muted" style="font-size:12px">'+esc(r[2]||'')+'</span></td><td>'+esc(r[1])+'</td></tr>';}).join('')+'</table>':'')
+      +(pending.length?'<p class="muted">'+esc(t('purityPending'))+' '+esc(pending.join('、'))+'</p>':'')
+      +'</div>';
+  }
+  function render(d, label, isSelf){
+    var loc=[d.country,d.region,d.city].filter(Boolean).join(' ');
+    var map='';
+    if(d.lat!=null&&d.lon!=null&&d.lat!==0){
+      var lat=d.lat, lon=d.lon, dlt=0.25;
+      var src='https://www.openstreetmap.org/export/embed.html?bbox='+(lon-dlt)+'%2C'+(lat-dlt)+'%2C'+(lon+dlt)+'%2C'+(lat+dlt)+'&layer=mapnik&marker='+lat+'%2C'+lon;
+      map='<iframe class="map" loading="lazy" src="'+src+'"></iframe><p class="muted" style="margin-top:6px"><a target="_blank" rel="noopener" href="https://www.openstreetmap.org/?mlat='+lat+'&mlon='+lon+'#map=10/'+lat+'/'+lon+'">'+esc(t('viewOsm'))+'</a></p>';
+    }
+    result.innerHTML='<div class="card">'
+      +'<div class="big-ip">'+esc(d.ip)+'<button class="copy" type="button" id="copyBtn">'+esc(t('copy'))+'</button></div>'
+      +(label?'<p class="muted">'+esc(label)+'</p>':'')
+      +'<div class="badges">'+typeBadges(d)+'</div>'
+      +'<table>'
+      +'<tr><td>'+esc(t('loc'))+'</td><td>'+esc(loc||'—')+'</td></tr>'
+      +'<tr><td>'+esc(t('country'))+'</td><td>'+esc(d.country||'—')+' '+(d.countryCode?'('+esc(d.countryCode)+')':'')+'</td></tr>'
+      +'<tr><td>'+esc(t('cityZip'))+'</td><td>'+esc(d.city||'—')+' '+(d.zip?'· '+esc(d.zip):'')+'</td></tr>'
+      +'<tr><td>'+esc(t('latlon'))+'</td><td>'+(d.lat!=null?esc(d.lat)+', '+esc(d.lon):'—')+'</td></tr>'
+      +'<tr><td>'+esc(t('tz'))+'</td><td>'+esc(d.timezone||'—')+'</td></tr>'
+      +'<tr><td>'+esc(t('isp'))+'</td><td>'+esc(d.isp||d.org||'—')+'</td></tr>'
+      +'<tr><td>'+esc(t('org'))+'</td><td>'+esc(d.org||'—')+'</td></tr>'
+      +'<tr><td>'+esc(t('asn'))+'</td><td>'+esc(d.as||'—')+(d.asname?' · '+esc(d.asname):'')+'</td></tr>'
+      +'<tr><td>'+esc(t('hostname'))+'</td><td>'+esc(d.hostname||'—')+'</td></tr>'
+      +'<tr><td>'+esc(t('source'))+'</td><td>'+esc(d.source||'—')+'</td></tr>'
+      +'</table>'+map+'</div>';
+    var cb=document.getElementById('copyBtn');
+    if(cb)cb.onclick=function(){var done=function(){cb.textContent=t('copied');setTimeout(function(){cb.textContent=t('copy');},1500);};
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(d.ip).then(done,done);else done();};
+    saveRecent(d.ip);
+    purityState={lookup:d,self:!!isSelf,webrtc:null,dns:null,exit:null};
+    renderPurity();
+  }
+  function renderASN(d, q){
+    result.innerHTML='<div class="card"><div class="big-ip">'+esc(d.asn)+'</div>'
+      +'<table><tr><td>'+esc(t('asnHolder'))+'</td><td>'+esc(d.holder||'—')+'</td></tr>'
+      +'<tr><td>'+esc(t('asnAnnounced'))+'</td><td>'+(d.announced?t('yes'):t('no'))+'</td></tr>'
+      +'<tr><td>'+esc(t('source'))+'</td><td>stat.ripe.net</td></tr></table>'
+      +(d.prefixes&&d.prefixes.length?'<h2 style="font-size:15px">'+esc(t('asnPrefixes'))+'</h2><p style="font-family:ui-monospace,Menlo,monospace;font-size:13px">'+d.prefixes.map(esc).join('<br>')+'</p>':'')
+      +'</div>';
+    saveRecent(d.asn);
+    if(q)loadRdap(q);
+  }
+  function showError(msg){result.innerHTML='<div class="card"><p class="error">'+esc(msg)+'</p></div>';purityState.lookup=null;renderPurity();}
+  function showLoading(){
+    // #result / #purity 已有 SSR 内容时保留（落地页首屏直接见结果），等新数据到了再替换，不闪“查询中…”
+    if(!result.innerHTML.trim())result.innerHTML='<div class="card"><p class="loading">'+esc(t('loading'))+'</p></div>';
+    document.getElementById('rdap').innerHTML='';
+    document.getElementById('dnsmulti').innerHTML='';
+    document.getElementById('leak').innerHTML='';
+    document.getElementById('outbound').innerHTML='';
+    document.getElementById('purity').innerHTML='';
+  }
+  function getRecent(){try{return JSON.parse(localStorage.getItem('ip-recent')||'[]');}catch(e){return [];}}
+  function saveRecent(q){try{var r=getRecent().filter(function(x){return x!==q;});r.unshift(q);localStorage.setItem('ip-recent',JSON.stringify(r.slice(0,8)));renderRecent();}catch(e){}}
+  function renderRecent(){var r=getRecent();document.getElementById('recent').innerHTML=r.length?r.map(function(x){return '<button type="button" data-q="'+esc(x)+'" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:999px;padding:2px 10px;margin:0 4px 4px 0;cursor:pointer;font-size:12px">'+esc(x)+'</button>';}).join(''):esc(t('none'));}
+  renderRecent();
+  document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-q]');if(b){go(b.getAttribute('data-q'));}});
+
+  // ---- 泄露检测 + 出口检测（纯浏览器端；针对你当前的上网环境，与上方查询的 IP 无关）----
+  function parseCandidate(line){
+    var m=line.match(/candidate:\S+ \d+ \S+ \d+ (\S+) \d+ typ (\w+)/);
+    return m?{ip:m[1],type:m[2]}:null;
+  }
+  function isPrivateIP(ip){
+    return /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|127\.|169\.254\.)/.test(ip)||ip.indexOf('fe80')===0||ip.indexOf('::1')===0||ip.indexOf('fd')===0||ip.indexOf('fc')===0;
+  }
+  function gatherWebRTC(ms){
+    return new Promise(function(resolve){
+      var ips=[],done=false,pc;
+      function finish(){if(!done){done=true;try{pc.close();}catch(e){}resolve(ips);}}
+      try{pc=new (window.RTCPeerConnection||window.webkitRTCPeerConnection)({iceServers:[{urls:'stun:stun.cloudflare.com:19302'},{urls:'stun:stun.l.google.com:19302'}]});}
+      catch(e){resolve(null);return;}
+      pc.onicecandidate=function(e){
+        if(!e.candidate)return;
+        var c=parseCandidate(e.candidate.candidate||'');
+        if(c&&c.ip.indexOf('.local')<0&&ips.every(function(x){return x.ip!==c.ip;}))ips.push(c);
+      };
+      try{pc.createDataChannel('t');}catch(e){}
+      pc.createOffer().then(function(o){return pc.setLocalDescription(o);}).catch(function(){finish();});
+      setTimeout(finish,ms||6000);
+      pc.onicegatheringstatechange=function(){if(pc.iceGatheringState==='complete')finish();};
+    });
+  }
+  async function runLeak(){
+    var box=document.getElementById('leak');
+    box.innerHTML='<div class="card"><h2 style="margin-top:0">'+esc(t('leakTitle'))+'</h2><p class="loading">'+esc(t('leakLoading'))+'</p></div>';
+    var meIp='';
+    try{var r=await fetch('/api/me');var d=await r.json();meIp=d.ip||'';}catch(e){}
+    var rtc=await gatherWebRTC(6000),rtcHtml;
+    if(rtc===null){
+      rtcHtml='<tr><td>'+esc(t('leakWebrtc'))+'</td><td>'+esc(t('leakNoSupport'))+'</td></tr>';
+    }else{
+      var pub=rtc.filter(function(c){return !isPrivateIP(c.ip);});
+      var leaked=pub.filter(function(c){return c.ip!==meIp;});
+      if(leaked.length){purityState.webrtc=true;rtcHtml='<tr><td>'+esc(t('leakWebrtc'))+'</td><td><span class="warn">'+esc(t('leakFound'))+'</span>：'+esc(tf('leakFoundDetail',{ips:leaked.map(function(c){return c.ip+' ('+c.type+')';}).join('、')}))+'</td></tr>';}
+      else if(pub.length){purityState.webrtc=false;rtcHtml='<tr><td>'+esc(t('leakWebrtc'))+'</td><td><span class="ok">'+esc(t('leakOkIp'))+'</span>：'+esc(tf('leakOkIpDetail',{ip:pub[0].ip}))+'</td></tr>';}
+      else{purityState.webrtc=false;rtcHtml='<tr><td>'+esc(t('leakWebrtc'))+'</td><td><span class="ok">'+esc(t('leakOkNone'))+'</span>：'+esc(t('leakOkNoneDetail'))+'</td></tr>';}
+      if(rtc.length)rtcHtml+='<tr><td>'+esc(t('leakCandidates'))+'</td><td class="mono">'+rtc.map(function(c){return esc(c.ip)+' · '+esc(c.type);}).join('<br>')+'</td></tr>';
+    }
+    var dnsHtml;
+    try{
+      var dr=await fetch('https://edns.ip-api.com/dns',{signal:AbortSignal.timeout(8000)});
+      var text=await dr.text();
+      var m=text.match(/dns:\s*([\d.:a-fA-F]+)\s*\(([^)]*)\)/);
+      if(m){
+        purityState.dns=(m[1]!==meIp);
+        dnsHtml='<tr><td>'+esc(t('leakResolver'))+'</td><td class="mono">'+esc(m[1])+'（'+esc(m[2])+'）</td></tr>'
+          +'<tr><td>'+esc(t('leakVerdict'))+'</td><td>'+esc(m[1]===meIp?t('leakDnsSame'):t('leakDnsDiff'))+'</td></tr>';
+      }else dnsHtml='<tr><td>'+esc(t('leakDns'))+'</td><td>'+esc(t('leakDnsNoResult'))+'</td></tr>';
+    }catch(e){dnsHtml='<tr><td>'+esc(t('leakDns'))+'</td><td>'+esc(t('leakDnsFail'))+'</td></tr>';}
+    renderPurity();
+    box.innerHTML='<div class="card"><h2 style="margin-top:0">'+esc(t('leakTitle'))+'</h2>'
+      +'<p class="muted">'+esc(t('leakNote'))+'</p><table>'
+      +rtcHtml+dnsHtml+'</table>'
+      +'<p style="margin-top:10px"><button class="copy" type="button" id="leakRetry">'+esc(t('leakRetry'))+'</button></p></div>';
+    var btn=document.getElementById('leakRetry');
+    if(btn)btn.onclick=function(){runLeak();};
+  }
+  var OUTBOUND_ECHO=[
+    ['ipify（IPv4）','https://api.ipify.org?format=json'],
+    ['ipify（IPv6）','https://api64.ipify.org?format=json'],
+    ['GeoJS','https://get.geojs.io/v1/ip.json'],
+    ['ipinfo.io','https://ipinfo.io/json'],
+  ];
+  var OUTBOUND_SITES=[
+    ['Google','https://www.google.com/'],['Cloudflare','https://www.cloudflare.com/'],
+    ['GitHub','https://github.com/'],['OpenAI','https://openai.com/'],
+    ['Claude','https://claude.ai/'],['微软|Microsoft','https://www.microsoft.com/'],
+    ['Apple','https://www.apple.com/'],['百度|Baidu','https://www.baidu.com/'],
+    ['哔哩哔哩|Bilibili','https://www.bilibili.com/'],['知乎|Zhihu','https://www.zhihu.com/'],
+  ];
+  function siteName(n){var p=String(n).split('|');return lang==='zh'?p[0]:(p[1]||p[0]);}
+  async function timedFetch(url,ms){
+    var t0=Date.now();
+    try{await fetch(url,{mode:'no-cors',cache:'no-store',signal:AbortSignal.timeout(ms||8000)});return Date.now()-t0;}
+    catch(e){return null;}
+  }
+  async function runOutbound(){
+    var box=document.getElementById('outbound');
+    box.innerHTML='<div class="card"><h2 style="margin-top:0">'+esc(t('outTitle'))+'</h2><p class="loading">'+esc(t('leakLoading'))+'</p></div>';
+    var echo=await Promise.all(OUTBOUND_ECHO.map(async function(s){
+      try{var r=await fetch(s[1],{signal:AbortSignal.timeout(8000)});var d=await r.json();return {name:s[0],ip:d.ip||''};}
+      catch(e){return {name:s[0],ip:''};}
+    }));
+    var uniq=echo.map(function(x){return x.ip;}).filter(Boolean).filter(function(v,i,a){return a.indexOf(v)===i;});
+    purityState.exit=uniq.length>1;
+    renderPurity();
+    var sites=await Promise.all(OUTBOUND_SITES.map(async function(s){
+      return {name:siteName(s[0]),ms:await timedFetch(s[1],8000)};
+    }));
+    box.innerHTML='<div class="card"><h2 style="margin-top:0">'+esc(t('outTitle'))+'</h2>'
+      +'<p class="muted">'+esc(t('outNote'))+'</p>'
+      +'<table>'+echo.map(function(x){return '<tr><td>'+esc(x.name)+'</td><td class="mono">'+esc(x.ip||'—')+'</td></tr>';}).join('')+'</table>'
+      +'<p class="muted" style="margin-top:8px">'+(uniq.length<=1?esc(t('outSame')):'<span class="warn">'+esc(t('outDiff'))+'</span>')+'</p>'
+      +'<div class="src-wrap"><table><tr><th>'+esc(t('outSite'))+'</th><th>'+esc(t('outLatency'))+'</th></tr>'
+      +sites.map(function(s){return '<tr><td>'+esc(s.name)+'</td><td>'+(s.ms==null?'<span class="warn">'+esc(t('outDown'))+'</span>':esc(String(s.ms))+' ms')+'</td></tr>';}).join('')
+      +'</table></div></div>';
+  }
+  function runLeakOutbound(){runLeak();runOutbound();}
+
+  // ---- V2：RDAP 注册信息 ----
+  // Worker 端 rdap.org 跳 ARIN 常对共享出口限流（时好时坏），失败时改从浏览器直连
+  // rdap.org（它和 ARIN 都回 Access-Control-Allow-Origin: *，访客自己的 IP 不易被限）
+  function rdapVcard(vcard, field){
+    if(!Array.isArray(vcard))return '';
+    var props=vcard[1]||[];
+    for(var i=0;i<props.length;i++){if(props[i][0]===field)return props[i][3]||'';}
+    return '';
+  }
+  function normalizeRdapClient(query, type, d){
+    var entities=(d.entities||[]).map(function(e){
+      var em=String(rdapVcard(e.vCardArray,'email')||'').replace(/^mailto:/,'');
+      return {roles:e.roles||[],name:rdapVcard(e.vCardArray,'fn'),email:em,handle:e.handle||''};
+    });
+    var events=(d.events||[]).map(function(e){return {action:e.eventAction||'',date:e.eventDate||''};});
+    var reg=null,chg=null;
+    events.forEach(function(e){if(e.action==='registration')reg=e;if(e.action==='last changed')chg=e;});
+    var abuse=null,registrant=null;
+    entities.forEach(function(e){if((e.roles||[]).indexOf('abuse')>=0)abuse=e;if((e.roles||[]).indexOf('registrant')>=0)registrant=e;});
+    var cidrs=(d.cidr0_cidrs||[]).map(function(c){return c.v4prefix?c.v4prefix+'/'+c.length:(c.v6prefix?c.v6prefix+'/'+c.length:'');}).filter(Boolean);
+    return {query:query,type:type,source:'rdap.org',objectClassName:d.objectClassName||'',handle:d.handle||'',
+      name:d.name||(registrant&&registrant.name)||'',startAddress:d.startAddress||'',endAddress:d.endAddress||'',
+      ipVersion:d.ipVersion||'',status:d.status||[],registration:reg?reg.date:'',lastChanged:chg?chg.date:'',
+      entities:entities,abuseEmail:abuse?abuse.email:'',cidrs:cidrs,port43:d.port43||'',
+      remarks:(d.remarks||[]).reduce(function(a,r){return a.concat(r.description||[]);},[])};
+  }
+  function renderRdap(d){
+    var box=document.getElementById('rdap');
+    var ent=(d.entities||[]).map(function(e){
+      return esc((e.roles||[]).join('/'))+': '+esc(e.name||e.handle||'—')+(e.email?' &lt;'+esc(e.email)+'&gt;':'');
+    }).join('<br>');
+    box.innerHTML='<div class="card"><h2 style="margin-top:0">'+esc(t('rdapTitle'))+'</h2><table>'
+      +'<tr><td>'+esc(t('rdapType'))+'</td><td>'+esc(d.type)+' · '+esc(d.objectClassName||'—')+'</td></tr>'
+      +'<tr><td>'+esc(t('rdapHandle'))+'</td><td>'+esc(d.handle||'—')+'</td></tr>'
+      +(d.name?'<tr><td>'+esc(t('rdapName'))+'</td><td>'+esc(d.name)+'</td></tr>':'')
+      +(d.startAddress?'<tr><td>'+esc(t('rdapRange'))+'</td><td class="mono">'+esc(d.startAddress)+' – '+esc(d.endAddress)+'</td></tr>':'')
+      +(d.cidrs&&d.cidrs.length?'<tr><td>'+esc(t('rdapCidr'))+'</td><td class="mono">'+d.cidrs.map(esc).join('<br>')+'</td></tr>':'')
+      +'<tr><td>'+esc(t('rdapStatus'))+'</td><td>'+esc((d.status||[]).join(', ')||'—')+'</td></tr>'
+      +'<tr><td>'+esc(t('rdapReg'))+'</td><td>'+esc(d.registration||'—')+'</td></tr>'
+      +'<tr><td>'+esc(t('rdapChanged'))+'</td><td>'+esc(d.lastChanged||'—')+'</td></tr>'
+      +(d.abuseEmail?'<tr><td>'+esc(t('rdapAbuse'))+'</td><td>'+esc(d.abuseEmail)+'</td></tr>':'')
+      +(ent?'<tr><td>'+esc(t('rdapEntities'))+'</td><td>'+ent+'</td></tr>':'')
+      +'<tr><td>'+esc(t('source'))+'</td><td>'+esc(t('rdapSource'))+'</td></tr>'
+      +'</table></div>';
+  }
+  async function loadRdapDirect(query){
+    var asMatch=query.match(/^AS?(\d+)$/i);
+    var rdapUrl, type;
+    if(isIP(query)){rdapUrl='https://rdap.org/ip/'+encodeURIComponent(query);type='ip';}
+    else if(asMatch){rdapUrl='https://rdap.org/autnum/'+asMatch[1];type='autnum';}
+    else if(/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(query)){rdapUrl='https://rdap.org/domain/'+encodeURIComponent(query);type='domain';}
+    else return false;
+    var r=await fetch(rdapUrl);
+    if(!r.ok)return false;
+    var d=await r.json();
+    if(!d.objectClassName)return false;
+    renderRdap(normalizeRdapClient(query,type,d));
+    return true;
+  }
+  async function loadRdap(query){
+    var box=document.getElementById('rdap');
+    try{
+      var r=await fetch('/api/rdap?query='+encodeURIComponent(query));
+      if(r.ok){
+        var d=await r.json();
+        if(!d.error){renderRdap(d);return;}
+      }
+      // Worker 端失败：改从浏览器直连 rdap.org
+      if(await loadRdapDirect(query))return;
+      throw new Error('rdap');
+    }catch(e){
+      try{if(await loadRdapDirect(query))return;}catch(e2){}
+      box.innerHTML='<div class="card"><h2 style="margin-top:0">'+esc(t('rdapTitle'))+'</h2><p class="muted">'+esc(t('rdapUnavailable'))+'</p></div>';
+    }
+  }
+
+  // ---- V2：多源 DNS 对照 ----
+  async function loadDnsMulti(opts){
+    var box=document.getElementById('dnsmulti');
+    try{
+      var url=opts.domain?('/api/dns-multi?domain='+encodeURIComponent(opts.domain)):('/api/dns-multi?ip='+encodeURIComponent(opts.ip));
+      var r=await fetch(url);
+      if(!r.ok)return;
+      var d=await r.json();
+      var resolvers=d.resolvers||[];
+      if(!resolvers.length)return;
+      var html='<div class="card"><h2 style="margin-top:0">'+esc(t('dnsTitle'))+'</h2>';
+      if(opts.domain){
+        var allA=[].concat.apply([],resolvers.map(function(x){return x.a||[];}));
+        var allAAAA=[].concat.apply([],resolvers.map(function(x){return x.aaaa||[];}));
+        var agreeA=new Set(allA).size<=1, agreeAAAA=new Set(allAAAA).size<=1;
+        html+='<p class="muted">'+esc(tf('dnsDomainNote',{d:opts.domain}))+'</p><div class="src-wrap"><table>'
+          +'<tr><th>'+esc(t('dnsResolver'))+'</th><th>'+esc(t('dnsA'))+(agreeA?'':' <span class="warn">'+esc(t('dnsMismatch'))+'</span>')+'</th><th>'+esc(t('dnsAaaa'))+(agreeAAAA?'':' <span class="warn">'+esc(t('dnsMismatch'))+'</span>')+'</th></tr>'
+          +resolvers.map(function(x){return '<tr><td>'+esc(x.name)+'</td><td class="mono">'+(x.a&&x.a.length?x.a.map(esc).join('<br>'):'—')+'</td><td class="mono">'+(x.aaaa&&x.aaaa.length?x.aaaa.map(esc).join('<br>'):'—')+'</td></tr>';}).join('')
+          +'</table></div>';
+      }else{
+        html+='<p class="muted">'+esc(tf('dnsPtrNote',{d:opts.ip}))+'</p><div class="src-wrap"><table>'
+          +'<tr><th>'+esc(t('dnsResolver'))+'</th><th>'+esc(t('dnsHostname'))+'</th></tr>'
+          +resolvers.map(function(x){return '<tr><td>'+esc(x.name)+'</td><td class="mono">'+(x.ptr&&x.ptr.length?x.ptr.map(esc).join('<br>'):'—')+'</td></tr>';}).join('')
+          +'</table></div>';
+      }
+      box.innerHTML=html+'</div>';
+    }catch(e){}
+  }
+
+  // ---- V2：IP 计算器（纯本地） ----
+  function ipToInt(s){var p=s.split('.').map(Number);return ((p[0]<<24)>>>0)+(p[1]<<16)+(p[2]<<8)+p[3];}
+  function intToIp(n){return [(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');}
+  function expandIPv6(s){
+    var parts=s.split('::');
+    var h=parts[0]?parts[0].split(':'):[], t=parts.length>1&&parts[1]?parts[1].split(':'):[];
+    var miss=8-h.length-t.length;
+    var full=h.concat(Array(miss<0?0:miss).fill('0'),t);
+    return full.map(function(g){return g.padStart(4,'0');}).join(':');
+  }
+  function calcIP(input){
+    input=(input||'').trim();
+    var m=input.match(/^([0-9a-fA-F:.]+)(?:\/(\d+))?$/);
+    if(!m)throw new Error(t('calcBadFormat'));
+    var addr=m[1], prefix=m[2]!=null?parseInt(m[2],10):null;
+    if(addr.indexOf(':')>=0){
+      if(prefix==null)prefix=128;
+      if(prefix<0||prefix>128)throw new Error(t('calcBadV6Prefix'));
+      var full=expandIPv6(addr);
+      var groups=full.split(':').map(function(g){return parseInt(g,16);});
+      var bits=prefix, net=groups.map(function(g,i){
+        var take=Math.max(0,Math.min(16,bits-i*16));
+        return take===0?0:(g&((0xFFFF<<(16-take))&0xFFFF));
+      });
+      var netStr=net.map(function(g){return g.toString(16);}).join(':');
+      var total=prefix===128?'1':'2^'+(128-prefix);
+      return {v6:true,rows:[[t('calcFull'),full],[tf('calcNetAddr',{p:prefix}),netStr+'/'+prefix],[t('calcPrefix'),String(prefix)],[t('calcTotalAddr'),total],[t('calcInt'),t('calcIntV6')]]};
+    }
+    if(!IP4.test(addr))throw new Error(tf('calcBadV4',{ip:addr}));
+    if(prefix==null)prefix=32;
+    if(prefix<0||prefix>32)throw new Error(t('calcBadV4Prefix'));
+    var ip=ipToInt(addr);
+    var mask=prefix===0?0:((0xFFFFFFFF<<(32-prefix))>>>0);
+    var net=(ip&mask)>>>0, bc=(net|(~mask>>>0))>>>0;
+    var total=Math.pow(2,32-prefix);
+    var usable=prefix>=31?total:total-2;
+    var first=prefix>=31?net:net+1, last=prefix>=31?bc:bc-1;
+    return {v6:false,rows:[
+      [t('calcIp'),addr],[t('calcMask'),intToIp(mask)],[t('calcWildcard'),intToIp(~mask>>>0)],
+      [t('calcNetwork'),intToIp(net)],[t('calcBroadcast'),intToIp(bc)],
+      [t('calcUsable'),String(usable)+tf('calcTotal',{n:total})],
+      [t('calcRange'),prefix>=31?intToIp(first)+' – '+intToIp(last):intToIp(first)+' – '+intToIp(last)],
+      [t('calcInt'),String(ip>>>0)],[t('calcHex'),'0x'+(ip>>>0).toString(16).toUpperCase().padStart(8,'0')],
+      [t('calcCidr'),intToIp(net)+'/'+prefix]
+    ]};
+  }
+  function runCalc(q){
+    var box=document.getElementById('calcResult');
+    try{
+      var r=calcIP(q);
+      box.innerHTML='<table>'+r.rows.map(function(row){return '<tr><td>'+row[0]+'</td><td class="mono">'+esc(row[1])+'</td></tr>';}).join('')+'</table>';
+    }catch(e){box.innerHTML='<p class="error">'+esc(e.message)+'</p>';}
+  }
+  document.getElementById('calcForm').addEventListener('submit',function(e){e.preventDefault();runCalc(document.getElementById('calcInput').value);});
+  document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-calc]');if(b){document.getElementById('calcInput').value=b.getAttribute('data-calc');runCalc(b.getAttribute('data-calc'));}});
+
+  async function lookupDirect(ip){
+    var r=await fetch('https://ip-api.com/json/'+encodeURIComponent(ip)+'?fields=status,message,country,countryCode,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,mobile,proxy,hosting,query');
+    var d=await r.json();
+    if(d.status!=='success')throw new Error(t('errLookup'));
+    return {source:'ip-api.com',ip:d.query,country:d.country,countryCode:d.countryCode,region:d.regionName,city:d.city,zip:d.zip,lat:d.lat,lon:d.lon,timezone:d.timezone,isp:d.isp,org:d.org,as:d.as,asname:d.asname,mobile:d.mobile,proxy:d.proxy,hosting:d.hosting};
+  }
+  async function lookup(ip){
+    try{
+      var r=await fetch('/api/lookup?ip='+encodeURIComponent(ip));
+      if(r.ok){
+        var d=await r.json();
+        // Worker 端 ip-api 常被上游限流、回退到 ipinfo 时缺 ISP/机房标识，
+        // 此时再从浏览器直连 ip-api 补一份完整数据，拿到就用完整的。
+        if(d.source==='ipinfo.io'){
+          try{return await lookupDirect(ip);}catch(e){return d;}
+        }
+        return d;
+      }
+      throw new Error('worker');
+    }catch(e){ return await lookupDirect(ip); }
+  }
+  async function go(q){
+    q=(q||'').trim();
+    if(!q){return goMe();}
+    input.value=q;
+    showLoading();
+    history.replaceState(null,'','/ip/'+encodeURIComponent(q)+(lang==='en'?'?lang=en':''));
+    try{
+      if(isASN(q)){
+        var ra=await fetch('/api/asn?as='+encodeURIComponent(q));
+        var da=await ra.json();
+        if(da.error)throw new Error(t('errAsn'));
+        renderASN(da,q);return;
+      }
+      var ip=q, label='', wasDomain=false;
+      if(!isIP(q)){
+        var rr=await fetch('/api/resolve?domain='+encodeURIComponent(q));
+        var dr=await rr.json();
+        if(!dr.ips||!dr.ips.length)throw new Error(tf('errDomain',{q:q}));
+        ip=dr.ips[0]; label=tf('domainTo',{q:q,ip:ip,more:dr.ips.length>1?tf('moreCount',{n:dr.ips.length}):''});
+        wasDomain=true;
+      }
+      var d=await lookup(ip);
+      try{var rh=await fetch('/api/rdns?ip='+encodeURIComponent(ip));var dh=await rh.json();if(dh.hostname)d.hostname=dh.hostname;}catch(e){}
+      render(d,label,false);
+      loadRdap(ip);
+      if(wasDomain)loadDnsMulti({domain:q}); else loadDnsMulti({ip:ip});
+      runLeakOutbound();
+    }catch(e){showError(e.message||t('errLookup'));}
+  }
+  async function goMe(){
+    showLoading();
+    history.replaceState(null,'','/'+(lang==='en'?'?lang=en':''));
+    try{
+      var r=await fetch('/api/me');
+      var d=await r.json();
+      if(!d.ip)throw new Error(t('errNoIp'));
+      render(d,t('yourIp'),true);
+      loadRdap(d.ip); loadDnsMulti({ip:d.ip}); runLeakOutbound();
+    }catch(e){showError(t('errNoIpRetry'));}
+  }
+  document.getElementById('form').addEventListener('submit',function(e){e.preventDefault();go(input.value);});
+  applyLang();
+  detectLangFromIP();
+  var m=location.pathname.match(/^\/ip\/(.+)$/);
+  var initial=m?decodeURIComponent(m[1]):(new URLSearchParams(location.search).get('q')||'');
+  if(initial)go(initial);else goMe();
+})();
+</script>
+</body>
+</html>
